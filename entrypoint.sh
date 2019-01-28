@@ -6,7 +6,7 @@ then
   FAST_SYNC_MODE="1"
 fi
 
-sed -i "s/{{BITCOIN_DATA_DIR}}/$BITCOIN_DATA_DIR/g" $BITCOIN_BASE_DIR/client.conf
+sed -i "s/{{BITCOIN_DATA_DIR}}/${BITCOIN_DATA_DIR//\//\\/}/g" $BITCOIN_BASE_DIR/client.conf
 
 # Set default FAST_SYNC_MODE
 if [ $FAST_SYNC_MODE=="1" ]
