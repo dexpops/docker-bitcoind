@@ -12,16 +12,27 @@ sed -i "s/{{BITCOIN_DATA_DIR}}/${BITCOIN_DATA_DIR//\//\\/}/g" $BITCOIN_BASE_DIR/
 if [ $FAST_SYNC_MODE=="1" ]
 then
 
+  # Set UTXO file
+  if [ -z $BITCOIN_UTXO_SNAPSHOT ]
+  then
+    BITCOIN_UTXO_SNAPSHOT="/utxo/utxo-snapshot.tar"
+  fi
+
+  while [ ! -f $BITCOIN_UTXO_SNAPSHOT ]
+  do
+    echo "Waiting for utxo snapshot to be ready..."
+    sleep 5
+  done
+
   sed -i "s/{{BITCOIN_PRUNE}}/1/g" $BITCOIN_BASE_DIR/client.conf
   sed -i "s/{{BITCOIN_RESCAN}}/0/g" $BITCOIN_BASE_DIR/client.conf
   sed -i "s/{{BITCOIN_TXINDEX}}/0/g" $BITCOIN_BASE_DIR/client.conf
 
-
   if [ ! -f "$BITCOIN_DATA_DIR/.fast_synced" ]
   then
-    tar -xf /utxo/utxo-snapshot.tar -C $BITCOIN_DATA_DIR/
+    tar -xf $BITCOIN_UTXO_SNAPSHOT -C $BITCOIN_DATA_DIR/
     touch $BITCOIN_DATA_DIR/.fast_synced
-    exit 1
+    ls -lastr $BITCOIN_DATA_DIR
   fi
 
 else
