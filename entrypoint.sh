@@ -28,8 +28,11 @@ then
   sed -i "s/{{BITCOIN_RESCAN}}/0/g" $BITCOIN_BASE_DIR/client.conf
   sed -i "s/{{BITCOIN_TXINDEX}}/0/g" $BITCOIN_BASE_DIR/client.conf
 
+  # If file does not exist, then resync with new file
   if [ ! -f "$BITCOIN_DATA_DIR/.fast_synced" ]
   then
+    rm -rf "$BITCOIN_DATA_DIR/blocks"
+    rm -rf "$BITCOIN_DATA_DIR/chainstate"
     tar -xf $BITCOIN_UTXO_SNAPSHOT -C $BITCOIN_DATA_DIR/
     touch $BITCOIN_DATA_DIR/.fast_synced
     ls -lastr $BITCOIN_DATA_DIR
