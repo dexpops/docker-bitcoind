@@ -33,9 +33,9 @@ then
   then
     rm -rf "$BITCOIN_DATA_DIR/blocks"
     rm -rf "$BITCOIN_DATA_DIR/chainstate"
+    echo "Extracting utxo snapshot from tarball..."
     tar -xf $BITCOIN_UTXO_SNAPSHOT -C $BITCOIN_DATA_DIR/
-    touch $BITCOIN_DATA_DIR/.fast_synced
-    ls -lastr $BITCOIN_DATA_DIR
+    touch $BITCOIN_DATA_DIR/.fast_synced    
   fi
 
 else
