@@ -8,14 +8,14 @@ prune-run:
 
 	docker run --rm --name=bitcoind \
 	-v bitcoind-volume:/app \
-	-d dexpops/docker-bitcoind:v0.17.1-build-5
+	-d dexpops/docker-bitcoind:v0.17.1-build-7
 
 run:
 	docker stop bitcoind
 
 	docker run --rm --name=bitcoind \
 	-v bitcoind-volume:/app \
-	-d dexpops/docker-bitcoind:v0.17.1-build-5
+	-d dexpops/docker-bitcoind:v0.17.1-build-7
 
 stop:
 	docker stop bitcoind
@@ -26,4 +26,4 @@ prune:
 	docker volume rm bitcoind-volume
 
 build:
-	docker build -t dexpops/docker-bitcoind:v0.17.1-build-5 .
+	docker build -t dexpops/docker-bitcoind:v0.17.1-build-7 .

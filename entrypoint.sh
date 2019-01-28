@@ -16,11 +16,14 @@ then
   sed -i "s/{{BITCOIN_RESCAN}}/0/g" $BITCOIN_BASE_DIR/client.conf
   sed -i "s/{{BITCOIN_TXINDEX}}/0/g" $BITCOIN_BASE_DIR/client.conf
 
-  while [ ! -f "$BITCOIN_DATA_DIR/.fast_synced" ]
-  do
-    echo "Waiting for $BITCOIN_DATA_DIR/.fast_synced to be ready..."
-    sleep 2
-  done
+
+  if [ ! -f "$BITCOIN_DATA_DIR/.fast_synced" ]
+  then
+    cd $BITCOIN_BASE_DIR
+    wget $BITCOIN_UTXO_URL
+    tar -xfv $BITCOIN_UTXO_URL -C $BITCOIN_DATA_DIR
+    touch $BITCOIN_DATA_DIR/.fast_synced
+  fi
 
 else
 

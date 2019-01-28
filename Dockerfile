@@ -7,6 +7,7 @@ ENV BITCOIN_DOWNLOAD_FILENAME bitcoin-${BITCOIN_VERSION}-x86_64-linux-gnu.tar.gz
 ENV BITCOIN_RELEASES_KEY 01EA5486DE18A882D4C2684590C8019E36C2E964
 ENV BITCOIN_BASE_DIR /app
 ENV BITCOIN_DATA_DIR $BITCOIN_BASE_DIR/data
+ENV BITCOIN_UTXO_URL http://utxosets.blob.core.windows.net/public/utxo-snapshot-bitcoin-mainnet-551636.tar
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
 		wget \
@@ -23,9 +24,8 @@ RUN gpg --import laanwj-releases.asc \
 	&& grep -o "$(sha256sum $BITCOIN_DOWNLOAD_FILENAME)" SHA256SUMS.asc \
   && mkdir $BITCOIN_BASE_DIR \
   && tar -xzvf $BITCOIN_DOWNLOAD_FILENAME -C $BITCOIN_BASE_DIR --strip-components=1 \
-	&& rm -Rfv bitcoin-* *.asc
-
-RUN chmod -R +x $BITCOIN_BASE_DIR/bin/bitcoin*
+	&& rm -Rfv bitcoin-* *.asc \
+	&& chmod -R +x $BITCOIN_BASE_DIR/bin/bitcoin*
 
 COPY files/ $BITCOIN_BASE_DIR/
 
