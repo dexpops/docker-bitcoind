@@ -21,7 +21,7 @@ then
   then
     cd $BITCOIN_BASE_DIR
     echo "Downloading UTXO image"
-    wget -q '$BITCOIN_UTXO_URL/$BITCOIN_UTXO_FILE'
+    wget $BITCOIN_UTXO_URL/$BITCOIN_UTXO_FILE
     Unpacking "$BITCOIN_UTXO_FILE to: $BITCOIN_DATA_DIR"
     tar -xfv $BITCOIN_UTXO_FILE -C $BITCOIN_DATA_DIR
     touch $BITCOIN_DATA_DIR/.fast_synced
