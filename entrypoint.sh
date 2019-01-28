@@ -19,14 +19,9 @@ then
 
   if [ ! -f "$BITCOIN_DATA_DIR/.fast_synced" ]
   then
-    cd $BITCOIN_BASE_DIR
-
-    Unpacking "$BITCOIN_UTXO_FILE to: $BITCOIN_DATA_DIR"
-
-    wget -q $BITCOIN_UTXO_URL/$BITCOIN_UTXO_FILE
-    Unpacking "$BITCOIN_UTXO_FILE to: $BITCOIN_DATA_DIR"
-    tar -xfv $BITCOIN_UTXO_FILE -C $BITCOIN_DATA_DIR
+    tar -xf /utxo/utxo-snapshot.tar -C $BITCOIN_DATA_DIR/
     touch $BITCOIN_DATA_DIR/.fast_synced
+    exit 1
   fi
 
 else

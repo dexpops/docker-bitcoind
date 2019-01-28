@@ -1,3 +1,3 @@
 #!/bin/bash
 
-docker build -t dexpops/docker-bitcoind:v0.17.1-build-7 .
+docker build -t dexpops/docker-bitcoind:latest .
