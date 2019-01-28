@@ -4,9 +4,9 @@ docker stop bitcoind
 docker rm bitcoind
 docker volume rm bitcoind-volume
 
-docker run --rm --name=bitcoind \
+docker run --name=bitcoind \
 -v bitcoind-volume:/app \
--v /home/core/utxo-snapshot-bitcoin-mainnet-551636.tar:/utxo-sets/utxo-snapshot-bitcoin-mainnet-551636.tar \
--d dexpops/docker-bitcoind:0.17.1-build-4
+-v utxo-data:/utxo:ro \
+-d dexpops/docker-bitcoind:v0.17.1-build-7
 
 docker logs -f bitcoind
