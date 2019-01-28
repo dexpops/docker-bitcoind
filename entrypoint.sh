@@ -16,13 +16,17 @@ then
   sed -i "s/{{BITCOIN_RESCAN}}/0/g" $BITCOIN_BASE_DIR/client.conf
   sed -i "s/{{BITCOIN_TXINDEX}}/0/g" $BITCOIN_BASE_DIR/client.conf
 
-  # If file does not exists then do a re-sync with utxo new image.
-  if [ ! -f "$BITCOIN_DATA_DIR/.fast_sync" ]
+
+  if [ ! -f "$BITCOIN_DATA_DIR/.fast_synced" ]
   then
-    rm -rf $BITCOIN_DATA_DIR/chainstate
-    rm -rf $BITCOIN_DATA_DIR/blocks
-    tar -xf /utxo/utxo-snapshot.tar -C $BITCOIN_DATA_DIR
-    touch $BITCOIN_DATA_DIR/.fast_sync
+    cd $BITCOIN_BASE_DIR
+
+    Unpacking "$BITCOIN_UTXO_FILE to: $BITCOIN_DATA_DIR"
+
+    wget -q $BITCOIN_UTXO_URL/$BITCOIN_UTXO_FILE
+    Unpacking "$BITCOIN_UTXO_FILE to: $BITCOIN_DATA_DIR"
+    tar -xfv $BITCOIN_UTXO_FILE -C $BITCOIN_DATA_DIR
+    touch $BITCOIN_DATA_DIR/.fast_synced
   fi
 
 else
