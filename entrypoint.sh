@@ -19,6 +19,9 @@ else
 
   touch $BITCOIN_DATA_DIR/.fast_synced
 
+  echo "Fast sync is now bootstrapped at:"
+  realpath $BITCOIN_DATA_DIR/.fast_synced
+
 fi
 
 exec /app/bin/bitcoind -conf=/app/client.conf
