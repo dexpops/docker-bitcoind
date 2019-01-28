@@ -20,7 +20,7 @@ then
 
   while [ ! -f $BITCOIN_UTXO_SNAPSHOT ]
   do
-    echo "Waiting for utxo snapshot to be ready..."
+    echo "$(date): Waiting for utxo snapshot to be ready on $BITCOIN_UTXO_SNAPSHOT..."
     sleep 5
   done
 
