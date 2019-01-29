@@ -12,17 +12,28 @@ sed -i "s/{{BITCOIN_DATA_DIR}}/${BITCOIN_DATA_DIR//\//\\/}/g" $BITCOIN_BASE_DIR/
 if [ $FAST_SYNC_MODE=="1" ]
 then
 
+  echo "Started bitcoind in FastSync mode"
+
   # Set UTXO file
   if [ -z $BITCOIN_UTXO_SNAPSHOT ]
   then
     BITCOIN_UTXO_SNAPSHOT="/utxo/utxo-snapshot.tar"
   fi
 
-  while [ ! -f $BITCOIN_UTXO_SNAPSHOT ]
+  # Set UTXO marker
+  if [ -z $BITCOIN_UTXO_MARKER ]
+  then
+    BITCOIN_UTXO_MARKER="/utxo/.finished_utxo"
+  fi
+
+  while [ ! -f $BITCOIN_UTXO_MARKER ]
   do
-    echo "$(date): Waiting for utxo snapshot to be ready on $BITCOIN_UTXO_SNAPSHOT..."
+    echo "$(date): Waiting for $BITCOIN_UTXO_MARKER to be ready..."
     sleep 5
   done
+
+  echo "Found $BITCOIN_UTXO_MARKER!"
+  echo "Replacing vars in $BITCOIN_BASE_DIR/client.conf"
 
   sed -i "s/{{BITCOIN_PRUNE}}/1/g" $BITCOIN_BASE_DIR/client.conf
   sed -i "s/{{BITCOIN_RESCAN}}/0/g" $BITCOIN_BASE_DIR/client.conf
@@ -33,9 +44,9 @@ then
   then
     rm -rf "$BITCOIN_DATA_DIR/blocks"
     rm -rf "$BITCOIN_DATA_DIR/chainstate"
-    echo "Extracting utxo snapshot from tarball..."
+    echo "Extracting utxo snapshot from tarball: $BITCOIN_UTXO_SNAPSHOT to: $BITCOIN_DATA_DIR"
     tar -xf $BITCOIN_UTXO_SNAPSHOT -C $BITCOIN_DATA_DIR/
-    touch $BITCOIN_DATA_DIR/.fast_synced    
+    touch $BITCOIN_DATA_DIR/.fast_synced
   fi
 
 else
