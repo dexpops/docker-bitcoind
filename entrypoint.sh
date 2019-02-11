@@ -6,6 +6,36 @@ then
   FAST_SYNC_MODE="1"
 fi
 
+if [ -z $BITCOIN_PORT ]
+then
+  BITCOIN_PORT="8333"
+fi
+
+if [ -z $BITCOIN_RPCPORT ]
+then
+  BITCOIN_RPCPORT="8332"
+fi
+
+if [ -z $BITCOIN_RPCALLOWIP ]
+then
+  BITCOIN_RPCALLOWIP="127.0.0.1"
+fi
+
+if [ -z $BITCOIN_BINDIP ]
+then
+  BITCOIN_BINDIP="127.0.0.1"
+fi
+
+if [ -z $BITCOIN_RPCUSER ]
+then
+  BITCOIN_RPCUSER=""
+fi
+
+if [ -z $BITCOIN_RPCPASSWORD ]
+then
+  BITCOIN_RPCPASSWORD=""
+fi
+
 sed -i "s/{{BITCOIN_DATA_DIR}}/${BITCOIN_DATA_DIR//\//\\/}/g" $BITCOIN_BASE_DIR/client.conf
 
 # Set default FAST_SYNC_MODE
@@ -56,5 +86,12 @@ else
   sed -i "s/{{BITCOIN_TXINDEX}}/1/g" $BITCOIN_BASE_DIR/client.conf
 
 fi
+
+sed -i "s/{{BITCOIN_RPCPASSWORD}}/0/g" $BITCOIN_BASE_DIR/client.conf
+sed -i "s/{{BITCOIN_RPCUSER}}/0/g" $BITCOIN_BASE_DIR/client.conf
+sed -i "s/{{BITCOIN_RPCALLOWIP}}/0/g" $BITCOIN_BASE_DIR/client.conf
+sed -i "s/{{BITCOIN_RPCPORT}}/0/g" $BITCOIN_BASE_DIR/client.conf
+sed -i "s/{{BITCOIN_PORT}}/0/g" $BITCOIN_BASE_DIR/client.conf
+sed -i "s/{{BITCOIN_BINDIP}}/0/g" $BITCOIN_BASE_DIR/client.conf
 
 exec /app/bin/bitcoind -conf=/app/client.conf
