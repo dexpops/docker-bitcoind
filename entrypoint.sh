@@ -47,13 +47,13 @@ then
   # Set UTXO file
   if [ -z $BITCOIN_UTXO_SNAPSHOT ]
   then
-    BITCOIN_UTXO_SNAPSHOT="/utxo/utxo-snapshot.tar"
+    BITCOIN_UTXO_SNAPSHOT="/snapshots/utxo-snapshot.tar"
   fi
 
   # Set UTXO marker
   if [ -z $BITCOIN_UTXO_MARKER ]
   then
-    BITCOIN_UTXO_MARKER="/utxo/.finished_utxo"
+    BITCOIN_UTXO_MARKER="/snapshots/.finished_utxo"
   fi
 
   while [ ! -f $BITCOIN_UTXO_MARKER ]
