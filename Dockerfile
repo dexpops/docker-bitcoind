@@ -1,38 +1,40 @@
-FROM ubuntu:xenial
-MAINTAINER Karsten Kaj Jakobsen <karsten@karstenajkobsen.dk>
+FROM debian:stretch-slim as builder
 
-ENV BITCOIN_VERSION 0.17.1
-ENV BITCOIN_DOWNLOAD_PATH https://bitcoin.org/bin/bitcoin-core-${BITCOIN_VERSION}
-ENV BITCOIN_DOWNLOAD_FILENAME bitcoin-${BITCOIN_VERSION}-x86_64-linux-gnu.tar.gz
-ENV BITCOIN_RELEASES_KEY 01EA5486DE18A882D4C2684590C8019E36C2E964
-ENV BITCOIN_BASE_DIR /app
-ENV BITCOIN_DATA_DIR $BITCOIN_BASE_DIR/data
+RUN set -ex \
+	&& apt-get update \
+	&& apt-get install -qq --no-install-recommends ca-certificates dirmngr gosu wget
 
-RUN apt-get update && apt-get install -y --no-install-recommends \
-		wget \
-    ca-certificates \
-	&& apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+ENV BITCOIN_VERSION 0.17.0
+ENV BITCOIN_URL https://bitcoincore.org/bin/bitcoin-core-0.17.0/bitcoin-0.17.0-x86_64-linux-gnu.tar.gz
+ENV BITCOIN_SHA256 9d6b472dc2aceedb1a974b93a3003a81b7e0265963bd2aa0acdcb17598215a4f
 
-RUN wget $BITCOIN_DOWNLOAD_PATH/$BITCOIN_DOWNLOAD_FILENAME \
-	&& wget $BITCOIN_DOWNLOAD_PATH/SHA256SUMS.asc \
-	&& wget https://bitcoin.org/laanwj-releases.asc
+# install bitcoin binaries
+RUN set -ex \
+	&& cd /tmp \
+	&& wget -qO bitcoin.tar.gz "$BITCOIN_URL" \
+	&& echo "$BITCOIN_SHA256 bitcoin.tar.gz" | sha256sum -c - \
+	&& mkdir bin \
+	&& tar -xzvf bitcoin.tar.gz -C /tmp/bin --strip-components=2 "bitcoin-$BITCOIN_VERSION/bin/bitcoin-cli" "bitcoin-$BITCOIN_VERSION/bin/bitcoind" \
+	&& cd bin \
+	&& wget -qO gosu "https://github.com/tianon/gosu/releases/download/1.11/gosu-amd64" \
+	&& echo "0b843df6d86e270c5b0f5cbd3c326a04e18f4b7f9b8457fa497b0454c4b138d7 gosu" | sha256sum -c -
 
-RUN gpg --import laanwj-releases.asc \
-	&& gpg --fingerprint $BITCOIN_RELEASES_KEY \
-	&& gpg --verify SHA256SUMS.asc \
-	&& grep -o "$(sha256sum $BITCOIN_DOWNLOAD_FILENAME)" SHA256SUMS.asc \
-  && mkdir $BITCOIN_BASE_DIR \
-  && tar -xzvf $BITCOIN_DOWNLOAD_FILENAME -C $BITCOIN_BASE_DIR --strip-components=1 \
-	&& rm -Rfv bitcoin-* *.asc \
-	&& chmod -R +x $BITCOIN_BASE_DIR/bin/bitcoin*
+FROM debian:stretch-slim
+COPY --from=builder "/tmp/bin" /usr/local/bin
 
-COPY files/ $BITCOIN_BASE_DIR/
+RUN chmod +x /usr/local/bin/gosu && groupadd -r bitcoin && useradd -r -m -g bitcoin bitcoin
 
-EXPOSE 8333 8332
+# create data directory
+ENV BITCOIN_DATA /data
+RUN mkdir "$BITCOIN_DATA" \
+	&& chown -R bitcoin:bitcoin "$BITCOIN_DATA" \
+	&& ln -sfn "$BITCOIN_DATA" /home/bitcoin/.bitcoin \
+	&& chown -h bitcoin:bitcoin /home/bitcoin/.bitcoin
 
-COPY entrypoint.sh /entrypoint.sh
-RUN chmod +x /entrypoint.sh
+VOLUME /data
 
-RUN mkdir $BITCOIN_DATA_DIR
+COPY docker-entrypoint.sh /entrypoint.sh
+ENTRYPOINT ["/entrypoint.sh"]
 
-ENTRYPOINT [ "/entrypoint.sh" ]
+EXPOSE 8332 8333 18332 18333 18443 18444
+CMD ["bitcoind"]
